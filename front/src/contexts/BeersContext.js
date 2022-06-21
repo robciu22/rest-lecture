@@ -1,14 +1,22 @@
-import { createContext, useEffect, useState } from 'react'
-import { fetchBeers } from '../utils/helper'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { SessionContext } from './SessionContext'
 
 const BeersContext = createContext()
 
 const BeersContextProvider = ({ children }) => {
   const [beers, setBeers] = useState([])
+  const { token, apiWithToken } = useContext(SessionContext)
+
+  const fetchBeers = async () => {
+    const response = await apiWithToken('beers')
+    setBeers(response)
+  }
 
   useEffect(() => {
-    fetchBeers(setBeers)
-  }, [])
+    if (token) {
+      fetchBeers()
+    }
+  }, [token])
 
   return <BeersContext.Provider value={{ beers }}>{children}</BeersContext.Provider>
 }
